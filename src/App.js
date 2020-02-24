@@ -1,24 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import WithoutHooksMain from "./components/without-hooks/main";
+import WithHooksMain from "./components/with-hooks/main";
+import "./App.css";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Router>
+        <div>
+          <div>
+            <Link to="/without-hooks/main">Without Hooks</Link>
+            <br/>
+            <Link to="/with-hooks/main">With Hooks</Link>
+          </div>
+          <Route path="/without-hooks/main" component={WithoutHooksMain} />
+          <Route path="/with-hooks/main" component={WithHooksMain} />
+        </div>
+      </Router>
     </div>
   );
 }
