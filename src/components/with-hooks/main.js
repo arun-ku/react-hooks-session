@@ -37,7 +37,7 @@ export default () => {
     setSelectedTile(id);
   }, []);
 
-  const getLargestWord = useCallback((post) => {
+  const getLargestWord = useCallback(post => {
     console.log("Finding largest word");
     let largestWord = "";
     post &&
@@ -54,7 +54,10 @@ export default () => {
 
   const post = posts.find(({ id: postId }) => postId === selectedTile);
 
-  const longestWord = useMemo(() => getLargestWord(post), [getLargestWord, post])
+  const longestWord = useMemo(() => getLargestWord(post), [
+    getLargestWord,
+    post
+  ]);
 
   return (
     <div>
