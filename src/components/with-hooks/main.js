@@ -1,83 +1,75 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { Component } from "react";
 import Post from "./Post";
 import "./style.scss";
 
-export default () => {
-  const [posts, setPosts] = useState([]);
-  const [selectedTile, setSelectedTile] = useState(null);
+export default class Main extends Component {
+  state = {
+    posts: [],
+    selectedTile: null
+  };
 
-  useEffect(() => {
+  componentDidMount() {
     fetch("https://jsonplaceholder.typicode.com/posts")
       .then(res => res.json())
-      .then(res => setPosts(res));
-  }, [setPosts]);
+      .then(res => this.setState({ posts: res }));
+  }
 
-  const onTitleUpdate = useCallback(
-    (newTitle, id) => {
-      setPosts(posts => {
-        const post = posts.find(({ id: postId }) => postId === id);
-        post.title = newTitle;
-        return [...posts];
-      });
-    },
-    [setPosts]
-  );
+  onTitleUpdate = (newTitle, id) => {
+    const { posts } = this.state;
+    const post = posts.find(({ id: postId }) => postId === id);
+    post.title = newTitle;
+    this.setState({ posts: posts });
+  };
 
-  const onPostDelete = useCallback(
-    id => {
-      setPosts(posts => {
-        const newPosts = posts.filter(({ id: postId }) => postId !== id);
-        return [...newPosts];
-      });
-    },
-    [setPosts]
-  );
+  onPostDelete = id => {
+    const { posts } = this.state;
+    const newPosts = posts.filter(({ id: postId }) => postId !== id);
+    this.setState({ posts: newPosts });
+  };
+  selectTile = id => {
+    this.setState({ selectedTile: id });
+  };
 
-  const selectTile = useCallback(id => {
-    setSelectedTile(id);
-  }, []);
-
-  const getLargestWord = useCallback((post) => {
-    console.log("Finding largest word");
+  getLargestWord = () => {
+    console.log('Finding largest word');
+    const { posts, selectedTile } = this.state;
+    const post = posts.find(({ id: postId }) => postId === selectedTile);
     let largestWord = "";
     post &&
-      post.body.split("\n").forEach(line =>
-        line.split(" ").forEach(word => {
-          if (word.length > largestWord.length) {
-            largestWord = word;
-          }
-        })
-      );
+      post.body.split("\n").forEach(line => line.split(' ').forEach(word => {
+        if (word.length > largestWord.length) {
+          largestWord = word;
+        }
+      }));
 
     return largestWord;
-  }, []);
+  };
 
-  const post = posts.find(({ id: postId }) => postId === selectedTile);
-
-  const longestWord = useMemo(() => getLargestWord(post), [getLargestWord, post])
-
-  return (
-    <div>
+  render() {
+    const { selectedTile, posts } = this.state;
+    return (
       <div>
-        {selectedTile ? (
-          <h2>{`Largest word in selected is: ${longestWord}`}</h2>
-        ) : null}
+        <div>
+          {selectedTile ? (
+            <h2>{`Largest word in selected is: ${this.getLargestWord()}`}</h2>
+          ) : null}
+        </div>
+        <div className="posts-base with-hooks">
+          {posts.map(post => {
+            return (
+              <Post
+                key={post.id}
+                id={post.id}
+                title={post.title}
+                content={post.body}
+                onTitleUpdate={this.onTitleUpdate}
+                onPostDelete={this.onPostDelete}
+                selectTile={this.selectTile}
+              />
+            );
+          })}
+        </div>
       </div>
-      <div className="posts-base with-hooks">
-        {posts.map(post => {
-          return (
-            <Post
-              key={post.id}
-              id={post.id}
-              title={post.title}
-              content={post.body}
-              onTitleUpdate={onTitleUpdate}
-              onPostDelete={onPostDelete}
-              selectTile={selectTile}
-            />
-          );
-        })}
-      </div>
-    </div>
-  );
-};
+    );
+  }
+}
